@@ -1,41 +1,43 @@
 <script setup lang="ts">
-import { onMounted, ref, shallowRef } from "vue";
+import {
+  dracula,
+  cobalt,
+  barf,
+  coolGlow,
+  tomorrow,
+  clouds,
+  rosePineDawn,
+} from "thememirror";
+import { ref, shallowRef } from "vue";
+import { Codemirror } from "vue-codemirror";
 import { defaultKeymap, insertTab } from "@codemirror/commands";
-import { EditorState, type Extension, StateEffect } from "@codemirror/state";
-import { EditorView, keymap, placeholder, lineNumbers } from "@codemirror/view";
-
+import { EditorState, type Extension } from "@codemirror/state";
+import { EditorView, keymap } from "@codemirror/view";
 import { css } from "@codemirror/lang-css";
 import { cpp } from "@codemirror/lang-cpp";
-import { html, htmlLanguage } from "@codemirror/lang-html";
+import { html } from "@codemirror/lang-html";
 import { python } from "@codemirror/lang-python";
 import { rust } from "@codemirror/lang-rust";
-import { dracula, cobalt, barf, coolGlow, tomorrow, clouds } from "thememirror";
-import { oneDark } from "@codemirror/theme-one-dark";
 import { sql } from "@codemirror/lang-sql";
-import { defaultHighlightStyle, HighlightStyle } from "@codemirror/language";
-import { basicSetup } from "codemirror";
-import { mdiCogBox, mdiMenuDown } from "@mdi/js";
-import { Codemirror } from "vue-codemirror";
+import { oneDark } from "@codemirror/theme-one-dark";
 import { javascript } from "@codemirror/lang-javascript";
+import { mdiCogBox, mdiMenuDown, mdiCloudDownload } from "@mdi/js";
 
 // let view = ref<EditorView>();
 // let state = ref<EditorState>();
 
+const tabSize = ref(3);
 const dialog = ref(false);
-
 let extensions = ref<Extension[]>();
-
-// Codemirror EditorView instance ref
 const view = shallowRef<EditorView>();
+const onclick = () => view.value?.focus();
+const code = ref(`console.log('Hello, world!')`);
+
 const handleReady = (payload: any) => {
   view.value = payload.view;
   initExtensions();
   updateSettings();
 };
-
-function onclick() {
-  view.value?.focus();
-}
 
 // Status is available at all times via Codemirror EditorView
 const getCodemirrorStates = () => {
@@ -50,17 +52,29 @@ const getCodemirrorStates = () => {
 };
 
 const languages = ref([
-  { title: "JavaScript", module: javascript },
-  { title: "HTML", module: html },
-  { title: "CSS", module: css },
-  { title: "C++", module: cpp },
-  { title: "python", module: python },
-  { title: "Rust", module: rust },
-  { title: "SQL", module: sql },
+  {
+    title: "JavaScript",
+    ext: "js",
+    module: javascript,
+    conf: { typescript: true },
+  },
+  {
+    title: "HTML",
+    ext: "html",
+    module: html,
+    conf: { autoCloseTags: true, matchClosingTags: true },
+  },
+  { title: "CSS", module: css, ext: "css", conf: {} },
+  { title: "C++", module: cpp, ext: "cpp", conf: {} },
+  { title: "python", ext: "py", module: python, conf: {} },
+  { title: "Rust", ext: "rs", module: rust, conf: {} },
+  { title: "SQL", module: sql, conf: {}, ext: "sql" },
 ]);
+const selectedLanguage = ref(languages.value[0].title);
 
 const themes = ref([
   { title: "Tomorrow", module: tomorrow },
+  { title: "Rosé Pine Dawn", module: rosePineDawn },
   { title: "Barf", module: barf },
   { title: "Dracula", module: dracula },
   { title: "Cobalt", module: cobalt },
@@ -68,16 +82,13 @@ const themes = ref([
   { title: "Clouds", module: clouds },
   { title: "One Dark", module: oneDark },
 ]);
+const selectedTheme = ref(themes.value[0].title);
 
-const code = ref(`console.log('Hello, world!')`);
-
-const selectedLanguage = ref(languages.value[0].title);
 function updateLanguage(selected: string) {
   const language = languages.value.find((lang) => lang.title === selected);
-  extensions.value?.push(language?.module()!);
+  extensions.value?.push(language?.module(language.conf)!);
 }
 
-const selectedTheme = ref(themes.value[0].title);
 function updateTheme(selected: string) {
   //@ts-ignore
   const theme = themes.value.find((theme) => theme.title === selected);
@@ -88,14 +99,6 @@ function updateTheme(selected: string) {
 function updateTabSize(size: number) {
   extensions.value?.push(EditorState.tabSize.of(size));
 }
-
-// function reconfigureEditor() {
-//   view.value?.dispatch({
-//     effects: StateEffect.reconfigure.of(extensions.value!),
-//   });
-// }
-
-const tabSize = ref(3);
 
 function initExtensions() {
   extensions.value = [];
@@ -115,28 +118,21 @@ function updateSettings() {
   dialog.value = false;
 }
 
-// const extensions = ref<Extension[]>([
-//   basicSetup,
-//   EditorState.tabSize.of(3),
-//   placeholder("Write the code here..."),
-//   lineNumbers(),
-//   javascript(),
-//   keymap.of([
-//     ...defaultKeymap,
-//     { key: "Tab", preventDefault: true, run: insertTab },
-//   ]),
-//   dracula,
-// ]);
+function downloadCode() {
+  const blob = new Blob([code.value], { type: "text/plain" });
+  const elem = window.document.createElement("a");
+  elem.style.display = "none";
+  elem.href = window.URL.createObjectURL(blob);
 
-onMounted(() => {
-  // const parent = document.getElementById("editor")!;
-  // state.value = EditorState.create({
-  //   extensions: extensions.value,
-  //   doc: doc.value,
-  // });
-  // view.value = new EditorView({ state: state.value, parent });
-  // view.value.focus();
-});
+  const language = languages.value.find(
+    (lang) => lang.title === selectedLanguage.value
+  );
+
+  elem.download = `live-code.${language?.ext}`;
+  document.body.appendChild(elem);
+  elem.click();
+  document.body.removeChild(elem);
+}
 </script>
 
 <template>
@@ -235,6 +231,16 @@ onMounted(() => {
             </v-col>
           </v-row>
         </v-dialog>
+
+        <v-btn
+          @click="downloadCode"
+          rounded="lg"
+          size="x-large"
+          title="Download"
+          variant="plain"
+          :icon="mdiCloudDownload"
+        >
+        </v-btn>
       </v-col>
     </v-row>
   </main>
@@ -243,7 +249,9 @@ onMounted(() => {
 <style>
 .cm-editor {
   height: 100%;
-  outline: solid !important;
+  outline: none !important;
+  border-right: 1px #e0e0e0 solid;
+  border-top: 1px #e0e0e0 solid;
 }
 
 .cm-scroller {
