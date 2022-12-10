@@ -1,5 +1,4 @@
 <template>
-  <v-divider></v-divider>
   <footer
     class="d-flex flex-column mt-8 align-center justify-center w-100 pa-3"
   >

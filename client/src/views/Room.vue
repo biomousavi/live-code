@@ -28,6 +28,7 @@ import { rust } from "@codemirror/lang-rust";
 import { python } from "@codemirror/lang-python";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { javascript } from "@codemirror/lang-javascript";
+import socket from "../socket";
 
 const toast = useToast();
 const tabSize = ref(3);
@@ -290,8 +291,7 @@ function importCode() {
 .cm-editor {
   height: 100%;
   outline: none !important;
-  border-right: 1px #e0e0e0 solid;
-  border-top: 1px #e0e0e0 solid;
+  border: 1px #e0e0e0 solid;
 }
 
 .cm-scroller {

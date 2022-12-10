@@ -66,6 +66,7 @@ const useCases = [
       </template>
     </div>
   </main>
+  <v-divider></v-divider>
 </template>
 
 <style scoped>
@@ -83,7 +84,7 @@ dotlottie-player {
 
 @media (max-width: 640px) {
   dotlottie-player {
-    bottom: -14%;
+    bottom: -24%;
   }
   .showcase {
     min-height: 80vh;
