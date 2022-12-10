@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 
+const props = defineProps({
+  dataImage: {
+    type: String,
+    required: true,
+  },
+});
+
 const card = ref<HTMLDivElement | null>(null);
 const width = ref(0);
 const height = ref(0);
@@ -23,6 +30,12 @@ const cardBgTransform = computed(() => {
   const tY = mousePY.value * -40;
   return {
     transform: `translateX(${tX}px) translateY(${tY}px)`,
+  };
+});
+
+const cardBgImage = computed(() => {
+  return {
+    backgroundImage: `url(${props.dataImage})`,
   };
 });
 
@@ -56,16 +69,8 @@ onMounted(() => {
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
   >
-    <div
-      data-sal-duration="1000"
-      data-sal="slide-up"
-      data-sal-repeat
-      data-sal-delay="300"
-      data-sal-easing="ease-out-back"
-      class="card"
-      :style="cardStyle"
-    >
-      <div class="card-bg box-content" :style="[cardBgTransform]"></div>
+    <div class="card" :style="cardStyle">
+      <div class="card-bg" :style="[cardBgTransform, cardBgImage]"></div>
       <div class="card-info">
         <slot name="header"></slot>
         <slot name="content"></slot>
@@ -130,13 +135,11 @@ p + p {
   background-color: #333;
   overflow: hidden;
   border-radius: 10px;
-  box-shadow: rgba(black, 0.66) 0 30px 60px 0, inset #333 0 0 0 5px,
-    inset rgba(white, 0.5) 0 0 0 6px;
   transition: 1s $returnEasing;
 }
 
 .card-bg {
-  opacity: 0.5;
+  opacity: 0.8;
   position: absolute;
   top: -20px;
   left: -20px;
@@ -148,6 +151,7 @@ p + p {
   background-size: cover;
   transition: 1s $returnEasing, opacity 5s 1s $returnEasing;
   pointer-events: none;
+  box-sizing: content-box;
 }
 
 .card-info {
@@ -159,6 +163,7 @@ p + p {
   transition: 0.6s 1.6s cubic-bezier(0.215, 0.61, 0.355, 1);
 
   p {
+    font-weight: bold;
     opacity: 0;
     text-shadow: rgba(black, 1) 0 2px 3px;
     transition: 0.6s 1.6s cubic-bezier(0.215, 0.61, 0.355, 1);
@@ -180,7 +185,7 @@ p + p {
     background-image: linear-gradient(
       to bottom,
       transparent 0%,
-      rgb(143, 143, 143) 100%
+      rgb(48, 48, 48) 60%
     );
     background-blend-mode: overlay;
     opacity: 0;
