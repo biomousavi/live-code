@@ -40,3 +40,8 @@
 .firacode {
   font-family: 'Fira Code', sans-serif !important;
 }
+
+
+ .Vue-Toastification__toast--default {
+   background-color: #333;
+ }

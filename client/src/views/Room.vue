@@ -8,24 +8,28 @@ import {
   clouds,
   rosePineDawn,
 } from "thememirror";
+import {
+  mdiCogBox,
+  mdiMenuDown,
+  mdiCloudDownload,
+  mdiFileUpload,
+} from "@mdi/js";
 import { ref, shallowRef } from "vue";
 import { Codemirror } from "vue-codemirror";
+import { EditorView, keymap } from "@codemirror/view";
+import { useToast, POSITION } from "vue-toastification";
 import { defaultKeymap, insertTab } from "@codemirror/commands";
 import { EditorState, type Extension } from "@codemirror/state";
-import { EditorView, keymap } from "@codemirror/view";
+import { sql } from "@codemirror/lang-sql";
 import { css } from "@codemirror/lang-css";
 import { cpp } from "@codemirror/lang-cpp";
 import { html } from "@codemirror/lang-html";
-import { python } from "@codemirror/lang-python";
 import { rust } from "@codemirror/lang-rust";
-import { sql } from "@codemirror/lang-sql";
+import { python } from "@codemirror/lang-python";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { javascript } from "@codemirror/lang-javascript";
-import { mdiCogBox, mdiMenuDown, mdiCloudDownload } from "@mdi/js";
 
-// let view = ref<EditorView>();
-// let state = ref<EditorState>();
-
+const toast = useToast();
 const tabSize = ref(3);
 const dialog = ref(false);
 let extensions = ref<Extension[]>();
@@ -118,7 +122,7 @@ function updateSettings() {
   dialog.value = false;
 }
 
-function downloadCode() {
+function exportCode() {
   const blob = new Blob([code.value], { type: "text/plain" });
   const elem = window.document.createElement("a");
   elem.style.display = "none";
@@ -133,19 +137,45 @@ function downloadCode() {
   elem.click();
   document.body.removeChild(elem);
 }
+
+function importCode() {
+  const input = document.createElement("input");
+  input.onchange = onchange;
+  input.type = "file";
+  input.click();
+
+  async function onchange(e: Event) {
+    const file = (e.target as HTMLInputElement)?.files?.[0];
+
+    if (!file) return;
+
+    // check the extension is exists
+    const fileExt = file.name.split(".").pop();
+
+    const fileLanguage = languages.value.find((lang) => lang.ext === fileExt);
+
+    if (!fileLanguage) {
+      return toast("File not supported.", {
+        position: POSITION.TOP_CENTER,
+        timeout: 4000,
+        icon: false,
+      });
+    }
+    code.value = await file.text();
+  }
+}
 </script>
 
 <template>
   <main>
     <v-row no-gutters style="min-height: 92vh">
-      <v-col>
+      <v-col cols="10" sm="11">
         <codemirror
           @click="onclick"
           v-model="code"
           placeholder="Code goes here..."
           :style="{ height: '400px' }"
           :autofocus="true"
-          :tab-size="2"
           :extensions="extensions"
           @ready="handleReady"
         />
@@ -233,12 +263,22 @@ function downloadCode() {
         </v-dialog>
 
         <v-btn
-          @click="downloadCode"
+          @click="exportCode"
           rounded="lg"
           size="x-large"
-          title="Download"
+          title="Export"
           variant="plain"
           :icon="mdiCloudDownload"
+        >
+        </v-btn>
+
+        <v-btn
+          @click="importCode"
+          rounded="lg"
+          size="x-large"
+          title="Import"
+          variant="plain"
+          :icon="mdiFileUpload"
         >
         </v-btn>
       </v-col>
@@ -256,5 +296,6 @@ function downloadCode() {
 
 .cm-scroller {
   font-family: "Fira Code", sans-serif !important;
+  word-wrap: break-word;
 }
 </style>
