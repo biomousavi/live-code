@@ -11,7 +11,7 @@ const router = createRouter({
       component: IndexView,
     },
     {
-      path: "/:room",
+      path: "/:roomId",
       name: "room",
       component: RoomView,
     },

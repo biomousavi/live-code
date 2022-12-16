@@ -43,5 +43,5 @@
 
 
  .Vue-Toastification__toast--default {
-   background-color: #333;
+   background-color: #333 !important;
  }

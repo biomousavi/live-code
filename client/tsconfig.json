@@ -5,7 +5,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "suppressImplicitAnyIndexErrors": true,
+    "noImplicitAny": false
   },
 
   "references": [

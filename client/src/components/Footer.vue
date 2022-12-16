@@ -10,8 +10,6 @@
     </div>
 
     <div class="d-flex align-center my-4 justify-center w-100">
-      <!-- <img src="/code.png" alt="live code image" /> -->
-
       <svg
         height="18"
         aria-hidden="true"

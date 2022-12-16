@@ -2,41 +2,33 @@
 import { computed, onMounted, ref } from "vue";
 
 const props = defineProps({
-  dataImage: {
-    type: String,
-    required: true,
-  },
+  dataImage: { type: String, required: true },
 });
 
-const card = ref<HTMLDivElement | null>(null);
 const width = ref(0);
 const height = ref(0);
 const mouseX = ref(0);
 const mouseY = ref(0);
+const card = ref<HTMLDivElement | null>(null);
 const mouseLeaveDelay = ref<number | null>(null);
 
 const mousePX = computed(() => mouseX.value / width.value);
 const mousePY = computed(() => mouseY.value / height.value);
+
 const cardStyle = computed(() => {
   const rX = mousePX.value * 30;
   const rY = mousePY.value * -30;
-  return {
-    transform: `rotateY(${rX}deg) rotateX(${rY}deg)`,
-  };
+  return { transform: `rotateY(${rX}deg) rotateX(${rY}deg)` };
 });
 
 const cardBgTransform = computed(() => {
   const tX = mousePX.value * -40;
   const tY = mousePY.value * -40;
-  return {
-    transform: `translateX(${tX}px) translateY(${tY}px)`,
-  };
+  return { transform: `translateX(${tX}px) translateY(${tY}px)` };
 });
 
 const cardBgImage = computed(() => {
-  return {
-    backgroundImage: `url(${props.dataImage})`,
-  };
+  return { backgroundImage: `url(${props.dataImage})` };
 });
 
 function handleMouseMove(e: MouseEvent) {
