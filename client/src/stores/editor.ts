@@ -38,7 +38,7 @@ export const useEditorStore = defineStore('editor', () => {
   const state = shallowRef<EditorState>();
 
   const tabSize = new Compartment();
-  const tabSizeNumber = ref(12);
+  const tabSizeNumber = ref(4);
 
   const route = useRoute();
   const latestUpdate = ref(['']);
