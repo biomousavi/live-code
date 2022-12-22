@@ -1,82 +1,92 @@
-import {
-  barf,
-  clouds,
-  cobalt,
-  dracula,
-  coolGlow,
-  tomorrow,
-  rosePineDawn,
-} from "thememirror";
-import {
-  syntaxHighlighting,
-  defaultHighlightStyle,
-} from "@codemirror/language";
-import { ref, computed, shallowRef } from "vue";
-import { defineStore } from "pinia";
-import { useRoute } from "vue-router";
-import { oneDark } from "@codemirror/theme-one-dark";
-import { EditorState, Text } from "@codemirror/state";
-import { defaultKeymap, insertTab } from "@codemirror/commands";
-import updateListener from "@/plugins/codemirror/extension/update-listener";
-import type { CodeChangedPayload, ParticipantsPayload } from "@/types";
-import { keymap, type EditorView } from "@codemirror/view";
+import { basicSetup } from 'codemirror';
+import { barf, clouds, cobalt, dracula, coolGlow, tomorrow, rosePineDawn } from 'thememirror';
+import { ref, shallowRef } from 'vue';
+import { defineStore } from 'pinia';
+import { useRoute } from 'vue-router';
+import { oneDark } from '@codemirror/theme-one-dark';
+import { Compartment, EditorState, Text } from '@codemirror/state';
+import { defaultKeymap, insertTab } from '@codemirror/commands';
+import updateListener from '@/plugins/codemirror/extension/update-listener';
+import type { CodeChangedPayload, ParticipantsPayload } from '@/types';
+import { EditorView, keymap, highlightActiveLineGutter } from '@codemirror/view';
 
-export const useEditorStore = defineStore("editor", () => {
+export const useEditorStore = defineStore('editor', () => {
   const languages = [
-    { title: "JavaScript", ext: "js" },
-    { title: "HTML", ext: "html" },
-    { title: "CSS", ext: "css" },
-    { title: "C++", ext: "cpp" },
-    { title: "python", ext: "py" },
-    { title: "Rust", ext: "rs" },
-    { title: "SQL", ext: "sql" },
+    { title: 'JavaScript', ext: 'js' },
+    { title: 'HTML', ext: 'html' },
+    { title: 'CSS', ext: 'css' },
+    { title: 'C++', ext: 'cpp' },
+    { title: 'python', ext: 'py' },
+    { title: 'Rust', ext: 'rs' },
+    { title: 'SQL', ext: 'sql' },
   ];
 
   const themes = [
-    { title: "Tomorrow", module: tomorrow },
-    { title: "Rosé Pine Dawn", module: rosePineDawn },
-    { title: "Barf", module: barf },
-    { title: "Dracula", module: dracula },
-    { title: "Cobalt", module: cobalt },
-    { title: "CoolGlow", module: coolGlow },
-    { title: "Clouds", module: clouds },
-    { title: "One Dark", module: oneDark },
+    { title: 'Tomorrow', module: tomorrow },
+    { title: 'Rosé Pine Dawn', module: rosePineDawn },
+    { title: 'Barf', module: barf },
+    { title: 'Dracula', module: dracula },
+    { title: 'Cobalt', module: cobalt },
+    { title: 'CoolGlow', module: coolGlow },
+    { title: 'Clouds', module: clouds },
+    { title: 'One Dark', module: oneDark },
   ];
 
-  const code = ref("");
-  const count = ref(0);
-  const tabSize = ref(3);
+  const code = ref('');
+  const extensions = ref();
+  const view = shallowRef<EditorView>();
+  const state = shallowRef<EditorState>();
+
+  const tabSize = new Compartment();
+  const tabSizeNumber = ref(12);
+
   const route = useRoute();
-  const latestUpdate = ref([""]);
+  const latestUpdate = ref(['']);
   const participantsCount = ref(1);
   const settingsDialog = ref(false);
-  const view = shallowRef<EditorView>();
-  const extensions = ref();
-  const selectedTheme = ref(themes[0].title);
+
+  // set default theme
+  const selectedTheme = ref(themes[7].title);
+  const theme = new Compartment();
+
+  // set default language
   const selectedLanguage = ref(languages[0].title);
+  const language = new Compartment();
 
-  const doubleCount = computed(() => count.value * 2);
-
-  function getRoomId(): string {
-    return route.params.roomId as string;
-  }
+  const getRoomId = () => route.params.roomId as string;
 
   function updateTabSize(size: number) {
-    extensions.value?.push(EditorState.tabSize.of(size));
+    view.value?.dispatch({
+      effects: tabSize.reconfigure(EditorState.tabSize.of(size)),
+    });
+
+    // extensions.value?.push(EditorState.tabSize.of(size));
   }
 
   function updateTheme(selected: string) {
-    const theme = themes.find((theme) => theme.title === selected)!;
-    extensions.value?.push(theme.module);
+    const newThemen = themes.find((theme) => theme.title === selected)!;
+    // extensions.value?.push(theme.module);
+
+    view.value?.dispatch({ effects: theme.reconfigure(newThemen.module) });
+
+    return newThemen.module;
+    // extensions.value?.push(theme.module);
   }
 
-  function updateLanguage(selected: string) {
-    const language = languages.find((lang) => lang.title === selected)!;
+  async function updateLanguage(selected: string) {
+    const lang = languages.find((lang) => lang.title === selected)!;
+
+    // import(`../plugins/codemirror/syntaxt/${language.ext}.ts`).then((m) => {
+    //   extensions.value?.push(m.default);
+    // });
 
     // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
-    import(`../plugins/codemirror/syntaxt/${language.ext}.ts`).then((m) => {
-      extensions.value?.push(m.default);
+    const langModule = await import(`../plugins/codemirror/syntaxt/${lang.ext}.ts`);
+
+    view.value?.dispatch({
+      effects: language.reconfigure(langModule.default),
     });
+    return langModule.default;
   }
 
   function updateParticipants(payload: ParticipantsPayload) {
@@ -104,37 +114,48 @@ export const useEditorStore = defineStore("editor", () => {
   }
 
   function updateSettings() {
-    initExtensions();
     updateLanguage(selectedLanguage.value);
     updateTheme(selectedTheme.value);
-    updateTabSize(tabSize.value);
+    updateTabSize(tabSizeNumber.value);
     settingsDialog.value = false;
   }
 
-  function initExtensions() {
-    extensions.value = [];
-    extensions.value.push(updateListener);
-    extensions.value.push(syntaxHighlighting(defaultHighlightStyle));
-    extensions.value.push(
-      keymap.of([
-        ...defaultKeymap,
-        { key: "Tab", preventDefault: true, run: insertTab },
-      ])
-    );
+  async function initExtensions() {
+    const lang = await updateLanguage(selectedLanguage.value);
+
+    state.value = EditorState.create({
+      extensions: [
+        basicSetup,
+        // listen to editor changes
+        updateListener,
+        // set dfefault language
+        language.of(lang),
+        highlightActiveLineGutter(),
+        // set default theme
+        theme.of(updateTheme(selectedTheme.value)),
+        tabSize.of(EditorState.tabSize.of(tabSizeNumber.value)),
+        keymap.of([...defaultKeymap, { key: 'Tab', preventDefault: true, run: insertTab }]),
+      ],
+    });
+
+    view.value = new EditorView({
+      state: state.value,
+      parent: document.querySelector('.container')!,
+    });
+
+    view.value.focus();
   }
 
   return {
     view,
     code,
-    count,
     route,
     themes,
-    tabSize,
+    tabSizeNumber,
     getRoomId,
     languages,
     extensions,
     updateTheme,
-    doubleCount,
     latestUpdate,
     selectedTheme,
     updateTabSize,

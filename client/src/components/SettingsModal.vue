@@ -55,7 +55,7 @@ const store = useEditorStore();
               label="Select Tab Size"
               :append-inner-icon="mdiMenuDown"
               :items="[1, 2, 3, 4, 6, 8]"
-              v-model="store.tabSize"
+              v-model="store.tabSizeNumber"
             ></v-select>
           </v-card-text>
 

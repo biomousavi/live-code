@@ -1,21 +1,18 @@
 <script setup lang="ts">
-import { mdiEye } from "@mdi/js";
-import { RoomEvents, type JoinAck, type JoinPayload } from "../types";
-import { Codemirror } from "vue-codemirror";
-import { useEditorStore } from "@/stores/editor";
-import router from "../router";
-import socket from "../socket";
-import SidePanel from "@/components/SidePanel.vue";
+import { onMounted } from 'vue';
+import { mdiEye } from '@mdi/js';
+import { RoomEvents, type JoinAck, type JoinPayload } from '../types';
+import { useEditorStore } from '@/stores/editor';
+import router from '../router';
+import socket from '../socket';
+import SidePanel from '@/components/SidePanel.vue';
 
 const store = useEditorStore();
-const onclick = () => store.view?.focus();
 
-const handleReady = (payload: any) => {
-  store.view = payload.view;
+onMounted(() => {
   store.initExtensions();
-  store.updateSettings();
   initRoomSocket();
-};
+});
 
 function joinToRoom() {
   // create payload for joining
@@ -38,31 +35,23 @@ function initRoomSocket() {
   socket.on(RoomEvents.PARTICIPANTS, store.updateParticipants);
   socket.on(RoomEvents.CODE_CHANGES, store.updateCodeChanges);
 }
+
+function onClickContainer() {
+  store.view?.focus();
+}
 </script>
 
 <template>
   <main>
-    <v-row no-gutters style="min-height: 92vh">
-      <v-col style="position: relative" cols="10" sm="11">
-        <v-card height="90vh">
-          <codemirror
-            @click="onclick"
-            v-model="store.code"
-            placeholder="Code goes here..."
-            :style="{ height: '400px' }"
-            :autofocus="true"
-            :extensions="store.extensions"
-            @ready="handleReady"
-          />
-        </v-card>
+    <v-row no-gutters style="min-height: 94vh">
+      <v-col style="position: relative" @click="onClickContainer" cols="10" sm="11">
+        <v-card class="container" height="90vh"> </v-card>
         <div class="participants d-flex justify-center align-center">
           <v-icon color="black" :icon="mdiEye"></v-icon>
           <span class="ma-1 font-weight-bold">
             {{ store.participantsCount }}
           </span>
-          <v-tooltip activator="parent" location="start">
-            Participants
-          </v-tooltip>
+          <v-tooltip activator="parent" location="start"> Participants </v-tooltip>
         </div>
       </v-col>
       <v-col cols="2" sm="1" class="d-flex flex-column align-center">
@@ -80,7 +69,7 @@ function initRoomSocket() {
 }
 
 .cm-scroller {
-  font-family: "Fira Code", sans-serif !important;
+  font-family: 'Fira Code', sans-serif !important;
   word-wrap: break-word;
 }
 .participants {
