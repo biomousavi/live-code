@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useEditorStore } from "@/stores/editor";
-import { mdiCogBox, mdiMenuDown } from "@mdi/js";
+import { useEditorStore } from '@/stores/editor';
+import { mdiCogBox, mdiMenuDown } from '@mdi/js';
 
 const store = useEditorStore();
 </script>
@@ -22,9 +22,7 @@ const store = useEditorStore();
     <v-row no-gutters justify="center" align="center">
       <v-col cols="11" sm="6" md="4">
         <v-card class="rounded-lg">
-          <v-card-title class="text-center font-weight-bold quicksand">
-            Editor Settings
-          </v-card-title>
+          <v-card-title class="text-center font-weight-bold quicksand"> Editor Settings </v-card-title>
 
           <v-card-text>
             <div class="my-2 text-subtitle-2 font-weight-bold">Syntax</div>
