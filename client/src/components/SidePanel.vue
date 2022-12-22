@@ -138,7 +138,7 @@ function onClickCopy(): void {
         >
           <v-col cols="10">
             <p style="white-space: nowrap; overflow-x: auto; font-size: 12px">
-              {{ getCurrentUrl }}
+              {{ getCurrentUrl() }}
             </p>
           </v-col>
           <v-col cols="auto">
