@@ -15,5 +15,6 @@ Install [Docker and docker-compose](https://www.docker.com/) .
 At the root of the project, run:
 
 ```bash
+docker-compose build
 docker-compose up
 ```
