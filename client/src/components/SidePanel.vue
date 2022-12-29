@@ -40,7 +40,6 @@ function importCode(): void {
 
   async function onchange(e: Event) {
     const file = (e.target as HTMLInputElement)?.files?.[0];
-    console.log(file);
 
     if (file) {
       // check the extension is exists
@@ -56,7 +55,11 @@ function importCode(): void {
 
         // add imported code to editor
         store.view?.dispatch({
-          changes: { from: 0, to: splitedCode.length, insert: Text.of(splitedCode) },
+          changes: {
+            from: 0,
+            insert: Text.of(splitedCode),
+            to: store.view.state.doc.length,
+          },
         });
 
         // if lang not supported
