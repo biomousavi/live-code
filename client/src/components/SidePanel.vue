@@ -9,6 +9,7 @@ import {
   mdiContentCopy,
   mdiWindowClose,
 } from '@mdi/js';
+import { Text } from '@codemirror/state';
 
 const SettingsModal = defineAsyncComponent(() => import('@/components/SettingsModal.vue'));
 
@@ -17,7 +18,8 @@ const store = useEditorStore();
 const menu = ref(false);
 
 function exportCode(): void {
-  const blob = new Blob([store.view?.state.doc.toJSON().join('\r\n')!], { type: 'text/plain' });
+  const doc = store.view?.state.doc.toJSON().join('\r\n')!;
+  const blob = new Blob([doc], { type: 'text/plain' });
   const elem = window.document.createElement('a');
   elem.style.display = 'none';
   elem.href = window.URL.createObjectURL(blob);
@@ -45,14 +47,18 @@ function importCode(): void {
       const fileExt = file.name.split('.').pop();
       const fileLanguage = store.languages.find((lang) => lang.ext === fileExt);
 
-      console.log(fileLanguage);
-
       // if file language exist on supported langs
       if (fileLanguage) {
-        // console.log('current', store.code);
-        // store.code = await file.text();
-        // console.log('new store', store.code);
-        // await store.updateLanguage(fileLanguage.title);
+        const code = await file.text();
+        const splitedCode = code.split(/\r\n|\r|\n/);
+
+        await store.updateLanguage(fileLanguage.title);
+
+        // add imported code to editor
+        store.view?.dispatch({
+          changes: { from: 0, to: splitedCode.length, insert: Text.of(splitedCode) },
+        });
+
         // if lang not supported
       } else {
         toast('File not supported.', {

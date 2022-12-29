@@ -89,8 +89,6 @@ export const useEditorStore = defineStore('editor', () => {
   function updateCodeChanges(payload: CodeChangedPayload) {
     // update last changes to prevent update event loop
     latestUpdate.value = payload.changes;
-    console.log(payload);
-
     const { selection, changes } = payload;
 
     // apply new changes to editor
