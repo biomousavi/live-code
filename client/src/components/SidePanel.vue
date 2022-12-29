@@ -17,13 +17,11 @@ const store = useEditorStore();
 const menu = ref(false);
 
 function exportCode(): void {
-  const blob = new Blob([store.code], { type: 'text/plain' });
+  const blob = new Blob([store.view?.state.doc.toJSON().join('\r\n')!], { type: 'text/plain' });
   const elem = window.document.createElement('a');
   elem.style.display = 'none';
   elem.href = window.URL.createObjectURL(blob);
-
   const language = store.languages.find((lang) => lang.title === store.selectedLanguage);
-
   elem.download = `live-code.${language?.ext}`;
   document.body.appendChild(elem);
   elem.click();
@@ -31,6 +29,8 @@ function exportCode(): void {
 }
 
 function importCode(): void {
+  // console.log(store.state?.doc);
+
   const input = document.createElement('input');
   input.onchange = onchange;
   input.type = 'file';
@@ -38,17 +38,21 @@ function importCode(): void {
 
   async function onchange(e: Event) {
     const file = (e.target as HTMLInputElement)?.files?.[0];
+    console.log(file);
 
     if (file) {
       // check the extension is exists
       const fileExt = file.name.split('.').pop();
       const fileLanguage = store.languages.find((lang) => lang.ext === fileExt);
 
+      console.log(fileLanguage);
+
       // if file language exist on supported langs
       if (fileLanguage) {
-        store.code = await file.text();
-        store.selectedLanguage = fileLanguage.title;
-
+        // console.log('current', store.code);
+        // store.code = await file.text();
+        // console.log('new store', store.code);
+        // await store.updateLanguage(fileLanguage.title);
         // if lang not supported
       } else {
         toast('File not supported.', {

@@ -32,7 +32,6 @@ export const useEditorStore = defineStore('editor', () => {
     { title: 'One Dark', module: oneDark },
   ];
 
-  const code = ref('');
   const extensions = ref();
   const view = shallowRef<EditorView>();
   const state = shallowRef<EditorState>();
@@ -59,8 +58,6 @@ export const useEditorStore = defineStore('editor', () => {
     view.value?.dispatch({
       effects: tabSize.reconfigure(EditorState.tabSize.of(size)),
     });
-
-    // extensions.value?.push(EditorState.tabSize.of(size));
   }
 
   function updateTheme(selected: string) {
@@ -75,10 +72,6 @@ export const useEditorStore = defineStore('editor', () => {
 
   async function updateLanguage(selected: string) {
     const lang = languages.find((lang) => lang.title === selected)!;
-
-    // import(`../plugins/codemirror/syntaxt/${language.ext}.ts`).then((m) => {
-    //   extensions.value?.push(m.default);
-    // });
 
     // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
     const langModule = await import(`../plugins/codemirror/syntaxt/${lang.ext}.ts`);
@@ -96,6 +89,7 @@ export const useEditorStore = defineStore('editor', () => {
   function updateCodeChanges(payload: CodeChangedPayload) {
     // update last changes to prevent update event loop
     latestUpdate.value = payload.changes;
+    console.log(payload);
 
     const { selection, changes } = payload;
 
@@ -148,15 +142,15 @@ export const useEditorStore = defineStore('editor', () => {
 
   return {
     view,
-    code,
+    state,
     route,
     themes,
-    tabSizeNumber,
     getRoomId,
     languages,
     extensions,
     updateTheme,
     latestUpdate,
+    tabSizeNumber,
     selectedTheme,
     updateTabSize,
     initExtensions,
