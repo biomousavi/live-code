@@ -1,26 +1,24 @@
 <script setup lang="ts">
-import { defineAsyncComponent } from "vue";
+import { defineAsyncComponent } from 'vue';
 
-const ShowcaseCard = defineAsyncComponent(
-  () => import("@/components/ShowcaseCard.vue")
-);
+const ShowcaseCard = defineAsyncComponent(() => import('@/components/ShowcaseCard.vue'));
 
 const useCases = [
   {
-    title: "Code with your team",
-    img: "/1.png",
-    desc: "Open a Codeshare editor, write or copy the code, then share it with friends and colleagues. Pair program and troubleshoot together.",
+    title: 'Code with your team',
+    img: '/1.png',
+    desc: 'Open a Codeshare editor, write or copy the code, then share it with friends and colleagues. Pair program and troubleshoot together.',
   },
   {
-    title: "Interview developers",
-    img: "/2.png",
+    title: 'Interview developers',
+    img: '/2.png',
 
-    desc: "Set coding tasks and observe in real-time when interviewing remotely or in person. Nobody likes writing code on a whiteboard.",
+    desc: 'Set coding tasks and observe in real-time when interviewing remotely or in person. Nobody likes writing code on a whiteboard.',
   },
   {
-    title: "Teach people to program",
-    img: "/3.png",
-    desc: "Share your code with students and peers then educate them. Universities and colleges around the world use Codeshare every day.",
+    title: 'Teach people to program',
+    img: '/3.png',
+    desc: 'Share your code with students and peers then educate them. Universities and colleges around the world use Codeshare every day.',
   },
 ];
 </script>
@@ -29,16 +27,12 @@ const useCases = [
   <main>
     <div class="showcase d-flex flex-column align-center">
       <div style="z-index: 1" class="d-flex flex-column align-center">
-        <h1 class="text-h6 text-md-h3 font-weight-bold mt-12 quicksand">
-          Share the code in real-time
-        </h1>
+        <h1 class="text-h6 text-md-h3 font-weight-bold mt-12 quicksand">Share the code in real-time</h1>
 
         <p class="text-caption text-md-subtitle-1 my-5">
           A lightweight and real-time code editor in your browser.
         </p>
-        <v-btn color="black" to="/new" class="font-weight-bold" rounded="lg">
-          Get started
-        </v-btn>
+        <v-btn color="black" to="/new" class="font-weight-bold" rounded="lg"> Get started </v-btn>
 
         <p class="my-4 text-caption">It's Free !</p>
       </div>

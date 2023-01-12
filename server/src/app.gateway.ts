@@ -25,10 +25,10 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleDisconnect(client: Socket) {
-    console.log('a client connected');
+    console.log(client.id, ' disconnected');
   }
 
-  handleConnection(client: Socket, ...args: any[]) {
-    console.log('a client disconnected');
+  handleConnection(client: Socket) {
+    console.log(client.id, ' connected');
   }
 }
