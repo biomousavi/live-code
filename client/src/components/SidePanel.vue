@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { defineAsyncComponent, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { defineAsyncComponent, ref, watch } from 'vue';
 import { useEditorStore } from '@/stores/editor';
 import { useToast, POSITION } from 'vue-toastification';
 import {
@@ -10,12 +11,13 @@ import {
   mdiWindowClose,
 } from '@mdi/js';
 import { Text } from '@codemirror/state';
-
 const SettingsModal = defineAsyncComponent(() => import('@/components/SettingsModal.vue'));
 
+const route = useRoute();
 const toast = useToast();
 const store = useEditorStore();
 const menu = ref(false);
+const roomLinkLoading = ref(true);
 
 function exportCode(): void {
   const doc = store.view?.state.doc.toJSON().join('\r\n')!;
@@ -31,8 +33,6 @@ function exportCode(): void {
 }
 
 function importCode(): void {
-  // console.log(store.state?.doc);
-
   const input = document.createElement('input');
   input.onchange = onchange;
   input.type = 'file';
@@ -86,6 +86,10 @@ function onClickCopy(): void {
     icon: false,
   });
 }
+
+watch(route, () => {
+  if (route.path !== 'new') roomLinkLoading.value = false;
+});
 </script>
 
 <template>
@@ -118,6 +122,7 @@ function onClickCopy(): void {
         title="Share"
         variant="plain"
         size="x-large"
+        :loading="roomLinkLoading"
         :icon="mdiMonitorShare"
         v-bind="props"
       ></v-btn>
