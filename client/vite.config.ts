@@ -1,8 +1,7 @@
-import vuetify from "vite-plugin-vuetify";
-import { fileURLToPath, URL } from "node:url";
-
-import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
+import vuetify from 'vite-plugin-vuetify';
+import { fileURLToPath, URL } from 'node:url';
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
 
 export default defineConfig(() => {
   return {
@@ -11,7 +10,7 @@ export default defineConfig(() => {
         template: {
           compilerOptions: {
             isCustomElement: (tag) => {
-              if (tag === "dotlottie-player") return true;
+              if (tag === 'dotlottie-player') return true;
             },
           },
         },
@@ -20,14 +19,14 @@ export default defineConfig(() => {
     ],
     resolve: {
       alias: {
-        "@": fileURLToPath(new URL("./src", import.meta.url)),
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
-    envDir: "../",
+    envDir: '../',
     server: {
-      host: "0.0.0.0",
+      host: '0.0.0.0',
       hmr: {
-        host: "localhost",
+        host: 'localhost',
       },
       port: parseInt(process.env.VITE_SERVER_PORT!) || 3000,
     },
