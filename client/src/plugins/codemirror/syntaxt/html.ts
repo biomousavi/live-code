@@ -1,4 +1,4 @@
-import { html } from "@codemirror/lang-html";
+import { html } from '@codemirror/lang-html';
 
 export default html({
   autoCloseTags: true,

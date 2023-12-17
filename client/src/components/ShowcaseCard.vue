@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref } from 'vue';
 
 const props = defineProps({
   dataImage: { type: String, required: true },
@@ -113,8 +113,7 @@ p + p {
     .card {
       transition: 0.6s $hoverEasing, box-shadow 2s $hoverEasing;
       box-shadow: rgba(white, 0.2) 0 0 40px 5px, rgba(white, 1) 0 0 0 1px,
-        rgba(black, 0.66) 0 30px 60px 0, inset #333 0 0 0 5px,
-        inset white 0 0 0 6px;
+        rgba(black, 0.66) 0 30px 60px 0, inset #333 0 0 0 5px, inset white 0 0 0 6px;
     }
   }
 }
@@ -167,18 +166,14 @@ p + p {
   }
 
   &:after {
-    content: "";
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
     z-index: 0;
     width: 100%;
     height: 100%;
-    background-image: linear-gradient(
-      to bottom,
-      transparent 0%,
-      rgb(48, 48, 48) 60%
-    );
+    background-image: linear-gradient(to bottom, transparent 0%, rgb(48, 48, 48) 60%);
     background-blend-mode: overlay;
     opacity: 0;
     transform: translateY(100%);
